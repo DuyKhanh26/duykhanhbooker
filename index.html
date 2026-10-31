@@ -42,7 +42,7 @@ const cats=[...new Set(cars.map(c=>c.category).filter(Boolean))];
 function show(){
  $('f').innerHTML=['all',...cats].map(c=>`<button class="${c===cat?'on':''}" data-c="${esc(c)}">${c==='all'?'Tất cả':esc(c)}</button>`).join('');
  let l;if(cat==='all'){const p=cars.filter(c=>c.pinned);l=(p.length?p:cars).slice(0,4)}else l=cars.filter(c=>c.category===cat);
- $('g').innerHTML=l.map(c=>`<div class="card"><img src="${esc(c.img)}" alt="${esc(c.name)}"><div class="b"><b>${esc(c.name)}</b><span class="mut">${esc(c.price)}</span><button class="btn g" data-i="${c.id}">Xem thêm</button></div></div>`).join('')||'<p class="mut">Chưa có xe.</p>';
+ $('g').innerHTML=l.map(c=>`<div class="card"><img loading="lazy" src="${esc(c.img)}" alt="${esc(c.name)}"><div class="b"><b>${esc(c.name)}</b><span class="mut">${esc(c.price)}</span><button class="btn g" data-i="${c.id}">Xem thêm</button></div></div>`).join('')||'<p class="mut">Chưa có xe.</p>';
 }
 show();
 $('f').onclick=e=>{if(e.target.dataset.c){cat=e.target.dataset.c;show()}};
