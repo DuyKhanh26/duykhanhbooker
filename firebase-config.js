@@ -11,7 +11,7 @@ const app=initializeApp({
 export const db=getFirestore(app), auth=getAuth(app);
 
 // Thông báo đơn mới qua ntfy (miễn phí). Đặt tên topic dài, ngẫu nhiên, khó đoán. Để trống nếu không dùng.
-export const NOTIFY={ntfyTopic:''}; // vd: 'thuexe-8f3k2x9q7m'
+export const NOTIFY={ntfyTopic:'thuexeduykhanhbooker'}; // vd: 'thuexe-8f3k2x9q7m'
 
 // Email quản trị duy nhất được đăng nhập admin.html (viết đúng, vd: ten@gmail.com)
 export const ADMIN_EMAIL='duykhanh2605.pq@gmail.com';
