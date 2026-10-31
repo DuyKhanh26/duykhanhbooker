@@ -10,13 +10,13 @@
  <div class="block" id="cusB" hidden><h2>Khách hàng</h2><div class="chips" id="cus"></div></div>
  </section>
 <section data-v="ve-tau" hidden>
- <h2>Đặt vé tàu</h2><p class="mut">Điền thông tin, mình sẽ gọi lại báo giá và xác nhận.</p>
+ <h2>Đặt vé tàu</h2><p class="mut">Điền thông tin, mình sẽ liên hệ lại để tư vấn lịch và giá vé.</p>
  <form data-bk="train" novalidate>
-  <div class="row"><label>Ga đi<input name="from"></label><label>Ga đến<input name="to"></label></div>
+  <div class="row"><label>Điểm đi<input name="from"></label><label>Điểm đến<input name="to"></label></div>
   <div class="row"><label>Ngày đi<input type="date" name="date"></label><label>Ngày về (nếu khứ hồi)<input type="date" name="back"></label></div>
   <label>Số vé<input type="number" name="qty" min="1" value="1"></label>
   <div class="row"><label>Họ tên<input name="name" autocomplete="name"></label><label>Số điện thoại<input name="phone" type="tel" autocomplete="tel"></label></div>
-  <label>Ghi chú (giờ tàu mong muốn, tên hành khách...)<textarea name="note" rows="3"></textarea></label>
+  <label>Ghi chú (lựa chỗ đỡ say, lựa chỗ gần cửa sổ,...)<textarea name="note" rows="3"></textarea></label>
   <p class="err"></p><button class="btn">Gửi yêu cầu</button></form>
 </section>
 <section data-v="phong" hidden>
@@ -84,18 +84,18 @@ addEventListener('hashchange',route);route();
 async function notify(t){const n=(NOTIFY||{}).ntfyTopic;
  if(n)try{await fetch('https://ntfy.sh/'+n,{method:'POST',body:t})}catch(e){}}
 $('bk').onsubmit=async e=>{e.preventDefault();const m=[];
- if(!$('pk').value)m.push('ngày giờ nhận');if(!$('rt').value)m.push('ngày giờ trả');
+ if(!$('pk').value)m.push('ngày giờ tàu đi');if(!$('rt').value)m.push('ngày giờ tàu về');
  if($('pk').value&&$('rt').value&&$('rt').value<=$('pk').value)m.push('giờ trả phải sau giờ nhận');
  if(!$('nm').value.trim())m.push('họ tên');if(!/^0\d{9,10}$/.test($('ph').value.replace(/\s/g,'')))m.push('số điện thoại 10–11 số');
  if(m.length){$('err').textContent='Cần kiểm tra: '+m.join(', ')+'.';return}
  $('err').textContent='';
  try{await addDoc(collection(db,'bookings'),{type:'car',pickup:$('pk').value,ret:$('rt').value,name:$('nm').value.trim(),phone:$('ph').value.trim(),qty:Math.max(1,+$('qty').value||1),car:$('car').value,note:$('note').value.trim(),status:'new',createdAt:serverTimestamp()});
-  notify(`🚗 Đơn đặt xe mới\n${$('nm').value.trim()} - ${$('ph').value.trim()}\n${$('car').value} x${$('qty').value}\nNhận: ${$('pk').value.replace('T',' ')}\nTrả: ${$('rt').value.replace('T',' ')}${$('note').value.trim()?'\nGhi chú: '+$('note').value.trim():''}`);
+  notify(`🛵 Đơn đặt xe mới\n${$('nm').value.trim()} - ${$('ph').value.trim()}\n${$('car').value} x${$('qty').value}\nNhận: ${$('pk').value.replace('T',' ')}\nTrả: ${$('rt').value.replace('T',' ')}${$('note').value.trim()?'\nGhi chú: '+$('note').value.trim():''}`);
   $('fb').innerHTML='<h3 class="ok">Đã gửi yêu cầu!</h3><p class="mut">Mình sẽ gọi lại số bạn để xác nhận.</p>'}
  catch(x){$('err').textContent='Gửi thất bại, vui lòng thử lại hoặc gọi trực tiếp.'}};
 const REQ={train:['from','to','date','name','phone'],room:['in','out','name','phone']};
-const N={from:'Ga đi',to:'Ga đến',date:'Ngày đi',back:'Ngày về',qty:'Số lượng',in:'Nhận phòng',out:'Trả phòng',guests:'Số khách',roomType:'Loại phòng',roomLoc:'Vị trí phòng',name:'Họ tên',phone:'SĐT',note:'Ghi chú'};
-const TT={train:'🚆 Đơn vé tàu mới',room:'🏨 Đơn đặt phòng mới'};
+const N={from:'Điểm đi',to:'Điểm đến',date:'Ngày đi',back:'Ngày về',qty:'Số lượng',in:'Nhận phòng',out:'Trả phòng',guests:'Số khách',roomType:'Loại phòng',roomLoc:'Vị trí phòng',name:'Họ tên',phone:'SĐT',note:'Ghi chú'};
+const TT={train:'🛳️ Đơn vé tàu mới',room:'🏨 Đơn đặt phòng mới'};
 document.querySelectorAll('form[data-bk]').forEach(f=>f.onsubmit=async e=>{e.preventDefault();
  const t=f.dataset.bk,d=Object.fromEntries(new FormData(f)),err=f.querySelector('.err'),m=REQ[t].filter(k=>!String(d[k]||'').trim()).map(k=>N[k].toLowerCase());
  if(d.phone&&!/^0\d{9,10}$/.test(d.phone.replace(/\s/g,'')))m.push('số điện thoại 10–11 số');
