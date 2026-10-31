@@ -3,10 +3,10 @@ import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase
 import {getFirestore} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 import {getAuth} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 const app=initializeApp({
-  apiKey:'YOUR_API_KEY',
-  authDomain:'YOUR_PROJECT.firebaseapp.com',
-  projectId:'YOUR_PROJECT',
-  appId:'YOUR_APP_ID'
+  apiKey:'AIzaSyCFY-Hq5Fu9Mi61NECcr8CjNbwhbeNYV88',
+  authDomain:'thuexe-84663.firebaseapp.com',
+  projectId:'thuexe-84663',
+  appId:'1:721684541824:web:51b22477beb0e75eb31165'
 });
 export const db=getFirestore(app), auth=getAuth(app);
 
@@ -14,4 +14,4 @@ export const db=getFirestore(app), auth=getAuth(app);
 export const NOTIFY={ntfyTopic:''}; // vd: 'thuexe-8f3k2x9q7m'
 
 // Email quản trị duy nhất được đăng nhập admin.html (viết đúng, vd: ten@gmail.com)
-export const ADMIN_EMAIL='YOUR_EMAIL@gmail.com';
+export const ADMIN_EMAIL='duykhanh2605.pq@gmail.com';
