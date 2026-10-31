@@ -12,7 +12,7 @@
 <section data-v="ve-tau" hidden>
  <h2>Đặt vé tàu</h2><p class="mut">Điền thông tin, mình sẽ gọi lại báo giá và xác nhận.</p>
  <form data-bk="train" novalidate>
-  <div class="row"><label>Ga đi<input name="from"></label><label>Ga đến<input name="to"></label></div>
+  <div class="row"><label>Điểm đi<input name="from"></label><label>Điểm đến<input name="to"></label></div>
   <div class="row"><label>Ngày đi<input type="date" name="date"></label><label>Ngày về (nếu khứ hồi)<input type="date" name="back"></label></div>
   <label>Số vé<input type="number" name="qty" min="1" value="1"></label>
   <div class="row"><label>Họ tên<input name="name" autocomplete="name"></label><label>Số điện thoại<input name="phone" type="tel" autocomplete="tel"></label></div>
@@ -36,7 +36,7 @@
 <section data-v="dat-xe" hidden>
  <h2>Đặt xe</h2><p class="mut">Điền thông tin, mình sẽ gọi lại xác nhận sớm.</p>
  <form id="bk" novalidate><div id="bkb">
-  <div class="row"><label>Ngày giờ nhận xe<input type="datetime-local" id="pk"></label><label>Ngày giờ trả xe<input type="datetime-local" id="rt"></label></div>
+  <div class="row"><label>Ngày giờ tàu chạy (ra đảo)<input type="datetime-local" id="pk"></label><label>Ngày giờ tàu chạy (rời đảo)<input type="datetime-local" id="rt"></label></div>
   <div class="row"><label>Họ tên<input id="nm" autocomplete="name"></label><label>Số điện thoại<input id="ph" type="tel" autocomplete="tel"></label></div>
   <div class="row"><label>Số lượng xe<input id="qty" type="number" min="1" value="1"></label><label>Loại xe<select id="car"></select></label></div>
   <label>Ghi chú<textarea id="note" rows="3"></textarea></label>
@@ -87,17 +87,17 @@ addEventListener('hashchange',route);route();
 async function notify(t){const n=(NOTIFY||{}).ntfyTopic;
  if(n)try{await fetch('https://ntfy.sh/'+n,{method:'POST',body:t})}catch(e){}}
 $('bk').onsubmit=async e=>{e.preventDefault();const m=[];
- if(!$('pk').value)m.push('ngày giờ nhận');if(!$('rt').value)m.push('ngày giờ trả');
- if($('pk').value&&$('rt').value&&$('rt').value<=$('pk').value)m.push('giờ trả phải sau giờ nhận');
+ if(!$('pk').value)m.push('ngày giờ tàu ra đảo');if(!$('rt').value)m.push('ngày giờ tàu rời đảo');
+ if($('pk').value&&$('rt').value&&$('rt').value<=$('pk').value)m.push('giờ tàu rời đảo phải sau giờ tàu ra đảo');
  if(!$('nm').value.trim())m.push('họ tên');if(!/^0\d{9,10}$/.test($('ph').value.replace(/\s/g,'')))m.push('số điện thoại 10–11 số');
  if(m.length){$('err').textContent='Cần kiểm tra: '+m.join(', ')+'.';return}
  $('err').textContent='';
  try{await addDoc(collection(db,'bookings'),{type:'car',pickup:$('pk').value,ret:$('rt').value,name:$('nm').value.trim(),phone:$('ph').value.trim(),qty:Math.max(1,+$('qty').value||1),car:$('car').value,note:$('note').value.trim(),status:'new',createdAt:serverTimestamp()});
-  notify(`🚗 Đơn đặt xe mới\n${$('nm').value.trim()} - ${$('ph').value.trim()}\n${$('car').value} x${$('qty').value}\nNhận: ${$('pk').value.replace('T',' ')}\nTrả: ${$('rt').value.replace('T',' ')}${$('note').value.trim()?'\nGhi chú: '+$('note').value.trim():''}`);
+  notify(`🚗 Đơn đặt xe mới\n${$('nm').value.trim()} - ${$('ph').value.trim()}\n${$('car').value} x${$('qty').value}\nTàu ra đảo: ${$('pk').value.replace('T',' ')}\nTàu rời đảo: ${$('rt').value.replace('T',' ')}${$('note').value.trim()?'\nGhi chú: '+$('note').value.trim():''}`);
   $('bkb').innerHTML='<h3 class="ok">Đã gửi yêu cầu!</h3><p class="mut">Mình sẽ gọi lại số bạn để xác nhận.</p>'}
  catch(x){$('err').textContent='Gửi thất bại, vui lòng thử lại hoặc gọi trực tiếp.'}};
 const REQ={train:['from','to','date','name','phone'],room:['in','out','name','phone']};
-const N={from:'Ga đi',to:'Ga đến',date:'Ngày đi',back:'Ngày về',qty:'Số lượng',in:'Nhận phòng',out:'Trả phòng',guests:'Số khách',roomType:'Loại phòng',roomLoc:'Vị trí phòng',name:'Họ tên',phone:'SĐT',note:'Ghi chú'};
+const N={from:'Điểm đi',to:'Điểm đến',date:'Ngày đi',back:'Ngày về',qty:'Số lượng',in:'Nhận phòng',out:'Trả phòng',guests:'Số khách',roomType:'Loại phòng',roomLoc:'Vị trí phòng',name:'Họ tên',phone:'SĐT',note:'Ghi chú'};
 const TT={train:'🚆 Đơn vé tàu mới',room:'🏨 Đơn đặt phòng mới'};
 document.querySelectorAll('form[data-bk]').forEach(f=>f.onsubmit=async e=>{e.preventDefault();
  const t=f.dataset.bk,d=Object.fromEntries(new FormData(f)),err=f.querySelector('.err'),m=REQ[t].filter(k=>!String(d[k]||'').trim()).map(k=>N[k].toLowerCase());
