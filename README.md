@@ -1,4 +1,4 @@
-# HƯỚNG DẪN CÀI ĐẶT WEB CHO THUÊ XE (miễn phí 100%)
+# HƯỚNG DẪN CÀI ĐẶT WEB DUY KHANH BOOKER (miễn phí 100%)
 
 File trong thư mục: index.html (trang khách) · admin.html (trang quản trị) · firebase-config.js (cấu hình, bạn phải sửa) · style.css (giao diện).
 Dùng: GitHub Pages + Firebase gói Spark + ntfy, đều miễn phí, không cần thẻ.
@@ -71,11 +71,20 @@ service cloud.firestore {
 2. Nhập `TEN-GITHUB.github.io` (chỉ phần tên miền: không có `https://`, không có `/thue-xe`) → Add.
 Thiếu bước này sẽ không đăng nhập được admin.
 
+## THÊM ẢNH (ảnh để trên GitHub, không tốn dung lượng Firebase)
+Web KHÔNG còn upload ảnh vào Firebase. Bạn để ảnh trong thư mục `img` của repo GitHub, rồi dán đường dẫn vào admin.
+1. **Chuẩn bị ảnh:** đặt tên không dấu, không khoảng trắng, chữ thường, vd `wave-alpha.jpg`, `avatar.jpg` (GitHub phân biệt hoa/thường). Nên thu nhỏ còn khoảng 800px chiều ngang, dưới 200KB (nén miễn phí tại https://squoosh.app hoặc https://tinypng.com).
+2. **Lần đầu:** khi up file ở Phần 4, kéo thả luôn cả thư mục `img` (đã có sẵn trong zip) rồi bỏ ảnh vào đó trước khi up.
+3. **Thêm ảnh sau này:** vào repo → bấm thư mục **img** → **Add file → Upload files** → chọn ảnh → **Commit changes**.
+4. **Dán vào admin:** ô "Link ảnh xe" gõ `img/wave-alpha.jpg`; ô "Link ảnh đại diện" gõ `img/avatar.jpg`. Ô xem trước sẽ hiện ảnh nếu đúng. Ảnh mới up cần chờ 1–2 phút mới hiện.
+- Cũng dán được link ảnh đầy đủ từ nơi khác (bắt đầu bằng `https://`).
+- Ảnh đã upload kiểu cũ vẫn hiển thị bình thường; muốn bỏ thì dán link mới vào để thay.
+
 ## PHẦN 6 – Dùng lần đầu
 
 1. Mở `.../admin.html` → bấm **Đăng nhập bằng Google** → chọn đúng tài khoản Google có email admin. Nếu chọn tài khoản khác sẽ bị báo không có quyền.
-2. Tab **Giới thiệu**: nhập tên thương hiệu, SĐT/Zalo, giới thiệu, kinh nghiệm, khách hàng (mỗi dòng 1 khách), tiêu đề phần xe, chọn ảnh đại diện → **Lưu**.
-3. Tab **Xe**: thêm từng xe (tên, hạng mục, giá, thông số, mô tả, ảnh). Tick **"Hiện ở mục Tất cả"** cho tối đa 4 xe muốn hiện ở tab Tất cả. Số thứ tự nhỏ hiện trước.
+2. Tab **Giới thiệu**: nhập tên thương hiệu, SĐT/Zalo, giới thiệu, kinh nghiệm, khách hàng (mỗi dòng 1 khách), tiêu đề phần xe, dán link ảnh đại diện (xem mục THÊM ẢNH) → **Lưu**.
+3. Tab **Xe**: thêm từng xe (tên, hạng mục, giá, thông số, mô tả, link ảnh). Tick **"Hiện ở mục Tất cả"** cho tối đa 4 xe muốn hiện ở tab Tất cả. Số thứ tự nhỏ hiện trước.
 4. Mở trang khách, đặt thử 1 đơn → điện thoại phải kêu thông báo ntfy, và đơn hiện ở tab **Đơn đặt** trong admin → đổi trạng thái/xóa đơn thử.
 
 ## Cập nhật sau này
@@ -83,7 +92,7 @@ Thiếu bước này sẽ không đăng nhập được admin.
 - Đổi code/giao diện: vào repo GitHub → bấm file → biểu tượng cây bút ✏️ sửa → Commit. Đợi 1–2 phút web tự cập nhật. Nếu không thấy thay đổi, bấm Ctrl+F5.
 
 ## Giới hạn miễn phí (Firebase Spark)
-Firestore: 1GB lưu trữ, 50.000 lượt đọc/ngày, 20.000 lượt ghi/ngày, dư dùng cho tiệm cho thuê nhỏ. Ảnh được thu nhỏ rồi lưu trong Firestore nên không cần Storage (Storage phải trả phí). KHÔNG bấm nâng cấp lên gói Blaze.
+Firestore: 1GB lưu trữ, 50.000 lượt đọc/ngày, 20.000 lượt ghi/ngày, dư dùng cho tiệm cho thuê nhỏ. Ảnh để trên GitHub nên Firebase chỉ lưu chữ, rất nhẹ. KHÔNG bấm nâng cấp lên gói Blaze.
 
 ## Lỗi thường gặp
 - **Trang trắng / không có xe:** firebase-config.js chưa dán đúng; bấm F12 → Console xem lỗi.
@@ -92,3 +101,18 @@ Firestore: 1GB lưu trữ, 50.000 lượt đọc/ngày, 20.000 lượt ghi/ngày
 - **Đăng nhập được nhưng không lưu được dữ liệu (permission denied):** email trong Rules chưa trùng đúng email admin.
 - **Không có thông báo ntfy:** tên topic trong app và trong firebase-config.js phải GIỐNG HỆT nhau; nhớ commit lại file config lên GitHub sau khi sửa.
 - **Link GitHub báo 404:** chờ thêm vài phút sau khi bật Pages, và kiểm tra repo đang để Public.
+
+---
+## ĐỔI TÊN WEB THÀNH duykhanhbooker
+1. **Đổi tên repo trên GitHub:** vào repo → **Settings → General → Repository name** → gõ `duykhanhbooker` → **Rename**.
+2. **Link mới:** `https://TEN-GITHUB.github.io/duykhanhbooker/` (admin: thêm `admin.html`). Link cũ `.../thue-xe/` sẽ không còn dùng được, nhớ cập nhật bookmark, QR, link đã gửi khách.
+3. **Firebase KHÔNG cần làm gì thêm:** domain `TEN-GITHUB.github.io` vẫn giữ nguyên nên Authorized domains không đổi. Dữ liệu cũ vẫn còn.
+4. **Đổi tên hiển thị trên web:** vào admin → tab **Giới thiệu** → ô **Tên thương hiệu** gõ `Duy Khanh Booker` → **Lưu**. Tên này hiện ở tiêu đề tab trình duyệt và đầu trang Giới thiệu.
+5. (Tùy chọn) Tên project Firebase: ⚙️ Project settings → General → Project name. Project ID không đổi được và không ảnh hưởng gì.
+
+## CÁC TRANG MỚI
+Thứ tự: Giới thiệu · Đặt vé tàu · Đặt phòng · Thông tin xe · Đặt xe.
+- **Đặt vé tàu / Đặt phòng:** khách điền form, đơn vào tab **Đơn đặt** trong admin (có biểu tượng 🚆 🏨 🚗) và báo qua ntfy.
+- **Loại chỗ vé tàu, loại phòng:** nhập ở admin → tab **Giới thiệu** (mỗi dòng một loại).
+- **Thông tin xe:** danh sách xe giờ nằm riêng ở tab này.
+- Cập nhật lên GitHub: thay các file `index.html`, `admin.html`, `style.css` bằng bản mới rồi Commit. Không đụng tới `firebase-config.js` đã điền của bạn.
