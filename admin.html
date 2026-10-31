@@ -1,0 +1,59 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Quản trị</title><link rel="stylesheet" href="style.css"></head><body><div class="wrap">
+<div id="lg" style="max-width:360px;margin:15vh auto"><h2>Đăng nhập quản trị</h2><p class="err" id="le"></p><button class="btn" id="gb">Đăng nhập bằng Google</button></div>
+<div id="app" hidden><div class="nav"><b class="brand">Quản trị</b><span class="tabs"><button data-t="s" class="on">Giới thiệu</button><button data-t="c">Xe</button><button data-t="b">Đơn đặt</button><button id="out">Thoát</button></span></div>
+<section id="p-s"><div class="box"><label>Tên thương hiệu<input id="s_brand"></label><label>SĐT / Zalo<input id="s_phone"></label>
+<label>Giới thiệu<textarea id="s_intro" rows="4"></textarea></label><label>Kinh nghiệm<textarea id="s_exp" rows="3"></textarea></label>
+<label>Khách hàng (mỗi dòng một khách)<textarea id="s_customers" rows="3"></textarea></label><label>Tiêu đề phần xe<input id="s_fleetTitle" placeholder="Những xe mình cho thuê"></label>
+<label>Ảnh đại diện<input type="file" id="s_av" accept="image/*"></label><img id="s_pv" style="max-width:120px;display:block;margin-bottom:12px">
+<button class="btn" id="s_save">Lưu</button> <span id="s_m" class="ok"></span></div></section>
+<section id="p-c" hidden><div class="box"><h3 id="c_h">Thêm xe</h3><div class="row"><label>Tên xe<input id="c_name"></label><label>Hạng mục (vd: Xe số, Xe ga, 4 chỗ)<input id="c_cat"></label></div>
+<div class="row"><label>Giá (nhập tự do, vd 150.000đ/ngày)<input id="c_price"></label><label>Thông số ngắn<input id="c_spec" placeholder="Số tự động · 110cc · 2 người"></label></div>
+<label>Mô tả / điều kiện thuê<textarea id="c_desc" rows="4"></textarea></label><div class="row"><label>Thứ tự (số nhỏ hiện trước)<input id="c_order" type="number" value="0"></label>
+<label><input type="checkbox" id="c_pin" style="width:auto"> Hiện ở mục "Tất cả" (tối đa 4)</label></div>
+<label>Ảnh xe<input type="file" id="c_img" accept="image/*"></label><img id="c_pv" style="max-width:160px;display:block;margin-bottom:12px">
+<button class="btn" id="c_save">Lưu xe</button> <button class="btn g" id="c_new">Làm mới</button></div><div id="c_list"></div></section>
+<section id="p-b" hidden><div id="b_list"></div></section></div></div>
+<script type="module">
+import {auth,db,ADMIN_EMAIL} from './firebase-config.js';
+import {GoogleAuthProvider,signInWithPopup,signOut,onAuthStateChanged} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import {doc,getDoc,setDoc,collection,getDocs,addDoc,updateDoc,deleteDoc,query,orderBy} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+const $=i=>document.getElementById(i),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const rs=f=>new Promise(r=>{const i=new Image();i.onload=()=>{const k=Math.min(1,800/i.width),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;c.getContext('2d').drawImage(i,0,0,c.width,c.height);r(c.toDataURL('image/jpeg',.7))};i.src=URL.createObjectURL(f)});
+const AE=(ADMIN_EMAIL||'').trim().toLowerCase(),L=t=>{$('le').className='err';$('le').textContent=t};
+$('gb').onclick=async()=>{try{await signInWithPopup(auth,new GoogleAuthProvider())}catch(x){L(x.code==='auth/popup-blocked'?'Trình duyệt chặn cửa sổ đăng nhập, hãy cho phép popup rồi thử lại.':x.code==='auth/unauthorized-domain'?'Chưa thêm domain github.io vào Authorized domains của Firebase.':'Đăng nhập không thành công: '+x.code)}};
+$('out').onclick=()=>signOut(auth);
+onAuthStateChanged(auth,u=>{if(u&&(u.email||'').toLowerCase()!==AE){signOut(auth);L('Tài khoản Google này không có quyền quản trị.');return}$('lg').hidden=!!u;$('app').hidden=!u;if(u){loadS();loadC();loadB()}});
+document.querySelector('.tabs').onclick=e=>{const t=e.target.dataset.t;if(!t)return;
+ document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b===e.target));
+ ['s','c','b'].forEach(k=>$('p-'+k).hidden=k!==t)};
+/* Giới thiệu */
+const K=['brand','phone','intro','exp','customers','fleetTitle'];let av='';
+async function loadS(){const d=(await getDoc(doc(db,'settings','site'))).data()||{};K.forEach(k=>$('s_'+k).value=d[k]||'');av=d.avatar||'';$('s_pv').src=av;$('s_pv').hidden=!av}
+$('s_av').onchange=async e=>{if(e.target.files[0]){av=await rs(e.target.files[0]);$('s_pv').src=av;$('s_pv').hidden=false}};
+$('s_save').onclick=async()=>{const d={avatar:av};K.forEach(k=>d[k]=$('s_'+k).value);await setDoc(doc(db,'settings','site'),d,{merge:true});$('s_m').textContent='Đã lưu';setTimeout(()=>$('s_m').textContent='',2000)};
+/* Xe */
+let cars=[],eid=null,img='';
+const F=['name','cat','price','spec','desc','order'];
+function reset(){eid=null;img='';F.forEach(k=>$('c_'+k).value=k==='order'?0:'');$('c_pin').checked=false;$('c_pv').hidden=true;$('c_h').textContent='Thêm xe';$('c_img').value=''}
+async function loadC(){cars=(await getDocs(collection(db,'cars'))).docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.order||0)-(b.order||0));
+ $('c_list').innerHTML=cars.map(c=>`<div class="box"><b>${esc(c.name)}</b> <span class="mut">· ${esc(c.category)} · ${esc(c.price)}${c.pinned?' · ★ Tất cả':''}</span><br>
+ <button class="btn g" data-e="${c.id}">Sửa</button> <button class="btn g" data-d="${c.id}">Xóa</button></div>`).join('')}
+$('c_img').onchange=async e=>{if(e.target.files[0]){img=await rs(e.target.files[0]);$('c_pv').src=img;$('c_pv').hidden=false}};
+$('c_new').onclick=reset;reset();
+$('c_save').onclick=async()=>{if(!$('c_name').value.trim())return alert('Nhập tên xe');
+ const d={name:$('c_name').value.trim(),category:$('c_cat').value.trim(),price:$('c_price').value,spec:$('c_spec').value,desc:$('c_desc').value,order:+$('c_order').value||0,pinned:$('c_pin').checked,img};
+ eid?await updateDoc(doc(db,'cars',eid),d):await addDoc(collection(db,'cars'),d);reset();loadC()};
+$('c_list').onclick=async e=>{const E=e.target.dataset.e,D=e.target.dataset.d;
+ if(E){const c=cars.find(x=>x.id===E);eid=E;img=c.img||'';$('c_name').value=c.name||'';$('c_cat').value=c.category||'';$('c_price').value=c.price||'';$('c_spec').value=c.spec||'';$('c_desc').value=c.desc||'';$('c_order').value=c.order||0;$('c_pin').checked=!!c.pinned;$('c_pv').src=img;$('c_pv').hidden=!img;$('c_h').textContent='Sửa xe';scrollTo(0,0)}
+ if(D&&confirm('Xóa xe này?')){await deleteDoc(doc(db,'cars',D));loadC()}};
+/* Đơn đặt */
+const ST={new:'Mới',confirmed:'Đã xác nhận',done:'Hoàn thành',cancelled:'Đã hủy'};
+async function loadB(){const l=(await getDocs(query(collection(db,'bookings'),orderBy('createdAt','desc')))).docs;
+ $('b_list').innerHTML=l.map(x=>{const b=x.data();return `<div class="box"><b>${esc(b.name)}</b> · <a href="tel:${esc(b.phone)}" style="color:var(--acc)">${esc(b.phone)}</a><br>
+ ${esc(b.car)} × ${esc(b.qty)}<br><span class="mut">Nhận: ${esc(b.pickup).replace('T',' ')} → Trả: ${esc(b.ret).replace('T',' ')}</span><br>${b.note?`<i>${esc(b.note)}</i><br>`:''}
+ <select data-s="${x.id}" style="width:auto">${Object.entries(ST).map(([k,v])=>`<option value="${k}" ${b.status===k?'selected':''}>${v}</option>`).join('')}</select>
+ <button class="btn g" data-x="${x.id}">Xóa</button></div>`}).join('')||'<p class="mut">Chưa có đơn.</p>'}
+$('b_list').onchange=e=>{if(e.target.dataset.s)updateDoc(doc(db,'bookings',e.target.dataset.s),{status:e.target.value})};
+$('b_list').onclick=async e=>{if(e.target.dataset.x&&confirm('Xóa đơn này?')){await deleteDoc(doc(db,'bookings',e.target.dataset.x));loadB()}};
+</script></body></html>

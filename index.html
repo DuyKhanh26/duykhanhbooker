@@ -1,0 +1,70 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cho thuê xe</title><link rel="stylesheet" href="style.css"></head><body>
+<header><div class="wrap nav"><a class="brand" id="brand" href="#gioi-thieu">Cho thuê xe</a>
+<nav><a class="t" href="#gioi-thieu">Giới thiệu</a><a class="t" href="#dat-xe">Đặt xe</a></nav></div></header>
+<main class="wrap">
+<section data-v="gioi-thieu">
+ <div class="hero"><div><h1 id="brand2"></h1><p class="mut pre" id="intro"></p>
+  <p><a class="btn" href="#dat-xe">Đặt xe ngay</a> <a class="btn g" id="call" href="#" hidden>Gọi / Zalo</a></p></div>
+  <img class="av" id="av" alt="Ảnh đại diện"></div>
+ <div class="block" id="expB" hidden><h2>Kinh nghiệm</h2><p class="mut pre" id="exp"></p></div>
+ <div class="block" id="cusB" hidden><h2>Khách hàng</h2><div class="chips" id="cus"></div></div>
+ <div class="block"><h2 id="fleetT">Những xe mình cho thuê</h2><div class="f" id="f"></div><div class="grid" id="g"></div></div>
+</section>
+<section data-v="dat-xe" hidden>
+ <h2>Đặt xe</h2><p class="mut">Điền thông tin, mình sẽ gọi lại xác nhận sớm.</p>
+ <form id="bk" novalidate><div id="fb">
+  <div class="row"><label>Ngày giờ nhận xe<input type="datetime-local" id="pk"></label><label>Ngày giờ trả xe<input type="datetime-local" id="rt"></label></div>
+  <div class="row"><label>Họ tên<input id="nm" autocomplete="name"></label><label>Số điện thoại<input id="ph" type="tel" autocomplete="tel"></label></div>
+  <div class="row"><label>Số lượng xe<input id="qty" type="number" min="1" value="1"></label><label>Loại xe<select id="car"></select></label></div>
+  <label>Ghi chú<textarea id="note" rows="3"></textarea></label>
+  <p class="err" id="err"></p><button class="btn">Gửi yêu cầu</button></div></form>
+</section></main>
+<dialog id="dlg"><img id="dI" alt=""><div class="b"><h3 id="dN"></h3><p><b id="dP" style="color:var(--acc)"></b></p>
+<p class="mut" id="dS"></p><p class="pre" id="dD"></p><button class="btn" id="dB">Đặt xe này</button> <button class="btn g" id="dX">Đóng</button></div></dialog>
+<script type="module">
+import {db,NOTIFY} from './firebase-config.js';
+import {doc,getDoc,collection,getDocs,addDoc,serverTimestamp} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+const $=i=>document.getElementById(i),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let cars=[],cat='all',s={};
+try{
+ s=(await getDoc(doc(db,'settings','site'))).data()||{};
+ cars=(await getDocs(collection(db,'cars'))).docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.order||0)-(b.order||0));
+}catch(e){console.error(e)}
+const brand=s.brand||'Cho thuê xe';document.title=brand;$('brand').textContent=brand;$('brand2').textContent=brand;
+$('intro').textContent=s.intro||'';if(s.avatar)$('av').src=s.avatar;else $('av').hidden=true;
+if(s.exp){$('expB').hidden=false;$('exp').textContent=s.exp}
+const cl=(s.customers||'').split('\n').map(x=>x.trim()).filter(Boolean);
+if(cl.length){$('cusB').hidden=false;$('cus').innerHTML=cl.map(x=>`<span>${esc(x)}</span>`).join('')}
+if(s.phone){$('call').hidden=false;$('call').href='tel:'+s.phone.replace(/\s/g,'')}
+$('fleetT').textContent=s.fleetTitle||'Những xe mình cho thuê';
+const cats=[...new Set(cars.map(c=>c.category).filter(Boolean))];
+function show(){
+ $('f').innerHTML=['all',...cats].map(c=>`<button class="${c===cat?'on':''}" data-c="${esc(c)}">${c==='all'?'Tất cả':esc(c)}</button>`).join('');
+ let l;if(cat==='all'){const p=cars.filter(c=>c.pinned);l=(p.length?p:cars).slice(0,4)}else l=cars.filter(c=>c.category===cat);
+ $('g').innerHTML=l.map(c=>`<div class="card"><img src="${esc(c.img)}" alt="${esc(c.name)}"><div class="b"><b>${esc(c.name)}</b><span class="mut">${esc(c.price)}</span><button class="btn g" data-i="${c.id}">Xem thêm</button></div></div>`).join('')||'<p class="mut">Chưa có xe.</p>';
+}
+show();
+$('f').onclick=e=>{if(e.target.dataset.c){cat=e.target.dataset.c;show()}};
+$('car').innerHTML=cars.map(c=>`<option>${esc(c.name)}</option>`).join('')||'<option>Chưa có xe</option>';
+let cur;
+$('g').onclick=e=>{const c=cars.find(x=>x.id===e.target.dataset.i);if(!c)return;cur=c;
+ $('dI').src=c.img||'';$('dN').textContent=c.name;$('dP').textContent=c.price||'';$('dS').textContent=c.spec||'';$('dD').textContent=c.desc||'';$('dlg').showModal()};
+$('dX').onclick=()=>$('dlg').close();
+$('dB').onclick=()=>{$('car').value=cur.name;$('dlg').close();location.hash='dat-xe'};
+function route(){const h=location.hash.slice(1)||'gioi-thieu';document.querySelectorAll('[data-v]').forEach(e=>e.hidden=e.dataset.v!==h);
+ document.querySelectorAll('a.t').forEach(a=>a.classList.toggle('on',a.hash==='#'+h));scrollTo(0,0)}
+addEventListener('hashchange',route);route();
+async function notify(t){const n=(NOTIFY||{}).ntfyTopic;
+ if(n)try{await fetch('https://ntfy.sh/'+n,{method:'POST',body:t})}catch(e){}}
+$('bk').onsubmit=async e=>{e.preventDefault();const m=[];
+ if(!$('pk').value)m.push('ngày giờ nhận');if(!$('rt').value)m.push('ngày giờ trả');
+ if($('pk').value&&$('rt').value&&$('rt').value<=$('pk').value)m.push('giờ trả phải sau giờ nhận');
+ if(!$('nm').value.trim())m.push('họ tên');if(!/^0\d{9,10}$/.test($('ph').value.replace(/\s/g,'')))m.push('số điện thoại 10–11 số');
+ if(m.length){$('err').textContent='Cần kiểm tra: '+m.join(', ')+'.';return}
+ $('err').textContent='';
+ try{await addDoc(collection(db,'bookings'),{pickup:$('pk').value,ret:$('rt').value,name:$('nm').value.trim(),phone:$('ph').value.trim(),qty:Math.max(1,+$('qty').value||1),car:$('car').value,note:$('note').value.trim(),status:'new',createdAt:serverTimestamp()});
+  notify(`🚗 Đơn đặt xe mới\n${$('nm').value.trim()} - ${$('ph').value.trim()}\n${$('car').value} x${$('qty').value}\nNhận: ${$('pk').value.replace('T',' ')}\nTrả: ${$('rt').value.replace('T',' ')}${$('note').value.trim()?'\nGhi chú: '+$('note').value.trim():''}`);
+  $('fb').innerHTML='<h3 class="ok">Đã gửi yêu cầu!</h3><p class="mut">Mình sẽ gọi lại số bạn để xác nhận.</p>'}
+ catch(x){$('err').textContent='Gửi thất bại, vui lòng thử lại hoặc gọi trực tiếp.'}};
+</script></body></html>
