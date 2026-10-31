@@ -35,7 +35,7 @@
 </section>
 <section data-v="dat-xe" hidden>
  <h2>Đặt xe</h2><p class="mut">Điền thông tin, mình sẽ liên hệ qua zalo để xác nhận sớm. Bạn vui lòng để ý zalo!</p>
- <form id="bk" novalidate><div id="fb">
+ <form id="bk" novalidate><div id="bkb">
   <div class="row"><label>Ngày giờ nhận xe<input type="datetime-local" id="pk"></label><label>Ngày giờ trả xe<input type="datetime-local" id="rt"></label></div>
   <div class="row"><label>Họ tên<input id="nm" autocomplete="name"></label><label>Số điện thoại<input id="ph" type="tel" autocomplete="tel"></label></div>
   <div class="row"><label>Số lượng xe<input id="qty" type="number" min="1" value="1"></label><label>Loại xe<select id="car"></select></label></div>
@@ -91,7 +91,7 @@ $('bk').onsubmit=async e=>{e.preventDefault();const m=[];
  $('err').textContent='';
  try{await addDoc(collection(db,'bookings'),{type:'car',pickup:$('pk').value,ret:$('rt').value,name:$('nm').value.trim(),phone:$('ph').value.trim(),qty:Math.max(1,+$('qty').value||1),car:$('car').value,note:$('note').value.trim(),status:'new',createdAt:serverTimestamp()});
   notify(`🛵 Đơn đặt xe mới\n${$('nm').value.trim()} - ${$('ph').value.trim()}\n${$('car').value} x${$('qty').value}\nNhận: ${$('pk').value.replace('T',' ')}\nTrả: ${$('rt').value.replace('T',' ')}${$('note').value.trim()?'\nGhi chú: '+$('note').value.trim():''}`);
-  $('fb').innerHTML='<h3 class="ok">Đã gửi yêu cầu!</h3><p class="mut">Mình sẽ liên hệ qua zalo để xác nhận. Bạn vui lòng để ý zalo!</p>'}
+  $('bkb').innerHTML='<h3 class="ok">Đã gửi yêu cầu!</h3><p class="mut">Mình sẽ liên hệ qua zalo để xác nhận. Bạn vui lòng để ý zalo!</p>'}
  catch(x){$('err').textContent='Gửi thất bại, vui lòng thử lại hoặc gọi trực tiếp.'}};
 const REQ={train:['from','to','date','name','phone'],room:['in','out','name','phone']};
 const N={from:'Điểm đi',to:'Điểm đến',date:'Ngày đi',back:'Ngày về',qty:'Số lượng',in:'Nhận phòng',out:'Trả phòng',guests:'Số khách',roomType:'Loại phòng',roomLoc:'Vị trí phòng',name:'Họ tên',phone:'SĐT',note:'Ghi chú'};
