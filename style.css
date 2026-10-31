@@ -33,3 +33,7 @@ dialog::backdrop{background:#000a}dialog img{width:100%;display:block}dialog .b{
 header .nav{justify-content:center}
 header nav{display:flex;gap:4px;overflow-x:auto;max-width:100%;white-space:nowrap}
 .hero p a{margin:0 6px 8px 0}
+dialog #dI{max-height:55vh;object-fit:contain;background:#000;cursor:zoom-in}
+#lb{max-width:none;max-height:none;width:100%;height:100%;background:#000;border:0;border-radius:0;overflow:hidden}
+#lb img{width:100%;height:100%;object-fit:contain}
+#lb .btn{position:fixed;top:max(16px,env(safe-area-inset-top));right:16px}

@@ -1,5 +1,5 @@
 <!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Duy Khánh Booker</title><link rel="stylesheet" href="style.css"></head><body>
+<title>Duy Khanh Booker</title><link rel="stylesheet" href="style.css"></head><body>
 <header><div class="wrap nav"><nav><a class="t" href="#gioi-thieu">Giới thiệu</a><a class="t" href="#ve-tau">Đặt vé tàu</a><a class="t" href="#phong">Đặt phòng</a><a class="t" href="#thong-tin-xe">Thông tin xe</a><a class="t" href="#dat-xe">Đặt xe</a></nav></div></header>
 <main class="wrap">
 <section data-v="gioi-thieu">
@@ -10,17 +10,17 @@
  <div class="block" id="cusB" hidden><h2>Khách hàng</h2><div class="chips" id="cus"></div></div>
  </section>
 <section data-v="ve-tau" hidden>
- <h2>Đặt vé tàu</h2><p class="mut">Điền thông tin, mình sẽ liên hệ lại zalo theo số đã điền để tư vấn lịch tàu và giá vé. Bạn vui lòng để ý zalo!</p>
+ <h2>Đặt vé tàu</h2><p class="mut">Điền thông tin, mình sẽ gọi lại báo giá và xác nhận.</p>
  <form data-bk="train" novalidate>
-  <div class="row"><label>Điểm đi<input name="from"></label><label>Điểm đến<input name="to"></label></div>
+  <div class="row"><label>Ga đi<input name="from"></label><label>Ga đến<input name="to"></label></div>
   <div class="row"><label>Ngày đi<input type="date" name="date"></label><label>Ngày về (nếu khứ hồi)<input type="date" name="back"></label></div>
   <label>Số vé<input type="number" name="qty" min="1" value="1"></label>
   <div class="row"><label>Họ tên<input name="name" autocomplete="name"></label><label>Số điện thoại<input name="phone" type="tel" autocomplete="tel"></label></div>
-  <label>Ghi chú (lựa chỗ đỡ say, lựa chỗ gần cửa sổ,...)<textarea name="note" rows="3"></textarea></label>
+  <label>Ghi chú (giờ tàu mong muốn, tên hành khách...)<textarea name="note" rows="3"></textarea></label>
   <p class="err"></p><button class="btn">Gửi yêu cầu</button></form>
 </section>
 <section data-v="phong" hidden>
- <h2>Đặt phòng</h2><p class="mut">Điền thông tin, mình sẽ liên hệ qua zalo để xác nhận phòng và giá. Bạn vui lòng để ý zalo!</p>
+ <h2>Đặt phòng</h2><p class="mut">Điền thông tin, mình sẽ gọi lại xác nhận phòng và giá.</p>
  <form data-bk="room" novalidate>
   <div class="row"><label>Ngày nhận phòng<input type="date" name="in"></label><label>Ngày trả phòng<input type="date" name="out"></label></div>
   <div class="row"><label>Số phòng<input type="number" name="qty" min="1" value="1"></label><label>Số khách<input type="number" name="guests" min="1" value="2"></label></div>
@@ -34,7 +34,7 @@
  <h2 id="fleetT">Những xe mình cho thuê</h2><div class="f" id="f"></div><div class="grid" id="g"></div>
 </section>
 <section data-v="dat-xe" hidden>
- <h2>Đặt xe</h2><p class="mut">Điền thông tin, mình sẽ liên hệ qua zalo để xác nhận sớm. Bạn vui lòng để ý zalo!</p>
+ <h2>Đặt xe</h2><p class="mut">Điền thông tin, mình sẽ gọi lại xác nhận sớm.</p>
  <form id="bk" novalidate><div id="bkb">
   <div class="row"><label>Ngày giờ nhận xe<input type="datetime-local" id="pk"></label><label>Ngày giờ trả xe<input type="datetime-local" id="rt"></label></div>
   <div class="row"><label>Họ tên<input id="nm" autocomplete="name"></label><label>Số điện thoại<input id="ph" type="tel" autocomplete="tel"></label></div>
@@ -43,40 +43,43 @@
   <p class="err" id="err"></p><button class="btn">Gửi yêu cầu</button></div></form>
 </section></main>
 <dialog id="dlg"><img id="dI" alt=""><div class="b"><h3 id="dN"></h3><p><b id="dP" style="color:var(--acc)"></b></p>
-<p class="mut" id="dS"></p><p class="pre" id="dD"></p><button class="btn" id="dB">Đặt xe này</button> <button class="btn g" id="dX">Đóng</button></div></dialog>
+<p class="mut" id="dS"></p><p class="pre" id="dD"></p><button class="btn" id="dB">Đặt xe này</button> <button class="btn g" id="dZ">Xem toàn ảnh</button> <button class="btn g" id="dX">Đóng</button></div></dialog>
+<dialog id="lb"><img id="lbI" alt=""><button class="btn">✕ Đóng</button></dialog>
 <script type="module">
 import {db,NOTIFY} from './firebase-config.js';
-import {doc,getDoc,collection,getDocs,addDoc,serverTimestamp} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import {doc,onSnapshot,collection,addDoc,serverTimestamp} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 const $=i=>document.getElementById(i),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let cars=[],cat='all',s={};
-try{
- s=(await getDoc(doc(db,'settings','site'))).data()||{};
- cars=(await getDocs(collection(db,'cars'))).docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.order||0)-(b.order||0));
-}catch(e){console.error(e)}
-const brand=s.brand||'Duy Khánh Booker';document.title=brand;$('brand2').textContent=brand;
-$('intro').textContent=s.intro||'';if(s.avatar)$('av').src=s.avatar;else $('av').hidden=true;
-if(s.exp){$('expB').hidden=false;$('exp').textContent=s.exp}
-const cl=(s.customers||'').split('\n').map(x=>x.trim()).filter(Boolean);
-if(cl.length){$('cusB').hidden=false;$('cus').innerHTML=cl.map(x=>`<span>${esc(x)}</span>`).join('')}
-if(s.phone){$('call').hidden=false;$('call').href='tel:'+s.phone.replace(/\s/g,'')}
-[['fb','fb'],['ig','ig']].forEach(([i,k])=>{if(s[k]){$(i).hidden=false;$(i).href=/^https?:\/\//i.test(s[k])?s[k]:'https://'+s[k]}});
-$('fleetT').textContent=s.fleetTitle||'Những xe mình cho thuê';
-const cats=[...new Set(cars.map(c=>c.category).filter(Boolean))];
+const opt=(t,d)=>(t||d).split('\n').map(x=>x.trim()).filter(Boolean).map(x=>`<option>${esc(x)}</option>`).join('');
+const fill=(id,h)=>{const v=$(id).value;$(id).innerHTML=h;if(v)$(id).value=v};
+function renderS(){
+ const brand=s.brand||'Duy Khanh Booker';document.title=brand;$('brand2').textContent=brand;
+ $('intro').textContent=s.intro||'';if(s.avatar){$('av').src=s.avatar;$('av').hidden=false}else $('av').hidden=true;
+ $('expB').hidden=!s.exp;$('exp').textContent=s.exp||'';
+ const cl=(s.customers||'').split('\n').map(x=>x.trim()).filter(Boolean);
+ $('cusB').hidden=!cl.length;$('cus').innerHTML=cl.map(x=>`<span>${esc(x)}</span>`).join('');
+ $('call').hidden=!s.phone;if(s.phone)$('call').href='tel:'+s.phone.replace(/\s/g,'');
+ [['fb','fb'],['ig','ig']].forEach(([i,k])=>{$(i).hidden=!s[k];if(s[k])$(i).href=/^https?:\/\//i.test(s[k])?s[k]:'https://'+s[k]});
+ $('fleetT').textContent=s.fleetTitle||'Những xe mình cho thuê';
+ fill('rtype',opt(s.roomTypes,'Phòng đơn\nPhòng đôi\nPhòng gia đình'));
+ fill('rloc',opt(s.roomLocs,'Trung tâm\nView biển'));
+}
 function show(){
+ const cats=[...new Set(cars.map(c=>c.category).filter(Boolean))];if(cat!=='all'&&!cats.includes(cat))cat='all';
  $('f').innerHTML=['all',...cats].map(c=>`<button class="${c===cat?'on':''}" data-c="${esc(c)}">${c==='all'?'Tất cả':esc(c)}</button>`).join('');
  let l;if(cat==='all'){const p=cars.filter(c=>c.pinned);l=(p.length?p:cars).slice(0,4)}else l=cars.filter(c=>c.category===cat);
  $('g').innerHTML=l.map(c=>`<div class="card"><img loading="lazy" src="${esc(c.img)}" alt="${esc(c.name)}"><div class="b"><b>${esc(c.name)}</b><span class="mut">${esc(c.price)}</span><button class="btn g" data-i="${c.id}">Xem thêm</button></div></div>`).join('')||'<p class="mut">Chưa có xe.</p>';
+ fill('car',cars.map(c=>`<option>${esc(c.name)}</option>`).join('')||'<option>Chưa có xe</option>');
 }
-show();
 $('f').onclick=e=>{if(e.target.dataset.c){cat=e.target.dataset.c;show()}};
-$('car').innerHTML=cars.map(c=>`<option>${esc(c.name)}</option>`).join('')||'<option>Chưa có xe</option>';
-const opt=(t,d)=>(t||d).split('\n').map(x=>x.trim()).filter(Boolean).map(x=>`<option>${esc(x)}</option>`).join('');
-$('rtype').innerHTML=opt(s.roomTypes,'Phòng đơn\nPhòng đôi\nPhòng gia đình');
-$('rloc').innerHTML=opt(s.roomLocs,'Trung tâm\nView biển');
+/* Tự cập nhật: khi admin lưu, trang khách đổi ngay không cần tải lại */
+onSnapshot(doc(db,'settings','site'),d=>{s=d.data()||{};renderS()},e=>console.error(e));
+onSnapshot(collection(db,'cars'),q=>{cars=q.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.order||0)-(b.order||0));show()},e=>console.error(e));
 let cur;
 $('g').onclick=e=>{const c=cars.find(x=>x.id===e.target.dataset.i);if(!c)return;cur=c;
- $('dI').src=c.img||'';$('dN').textContent=c.name;$('dP').textContent=c.price||'';$('dS').textContent=c.spec||'';$('dD').textContent=c.desc||'';$('dlg').showModal()};
+ $('dI').src=c.img||'';$('dI').hidden=!c.img;$('dZ').hidden=!c.img;$('dN').textContent=c.name;$('dP').textContent=c.price||'';$('dS').textContent=c.spec||'';$('dD').textContent=c.desc||'';$('dlg').showModal()};
 $('dX').onclick=()=>$('dlg').close();
+const zoom=()=>{$('lbI').src=$('dI').src;$('lb').showModal()};$('dI').onclick=zoom;$('dZ').onclick=zoom;$('lb').onclick=()=>$('lb').close();
 $('dB').onclick=()=>{$('car').value=cur.name;$('dlg').close();location.hash='dat-xe'};
 function route(){const h=location.hash.slice(1)||'gioi-thieu';document.querySelectorAll('[data-v]').forEach(e=>e.hidden=e.dataset.v!==h);
  document.querySelectorAll('a.t').forEach(a=>a.classList.toggle('on',a.hash==='#'+h));scrollTo(0,0)}
@@ -84,27 +87,27 @@ addEventListener('hashchange',route);route();
 async function notify(t){const n=(NOTIFY||{}).ntfyTopic;
  if(n)try{await fetch('https://ntfy.sh/'+n,{method:'POST',body:t})}catch(e){}}
 $('bk').onsubmit=async e=>{e.preventDefault();const m=[];
- if(!$('pk').value)m.push('ngày giờ tàu đi');if(!$('rt').value)m.push('ngày giờ tàu về');
+ if(!$('pk').value)m.push('ngày giờ nhận');if(!$('rt').value)m.push('ngày giờ trả');
  if($('pk').value&&$('rt').value&&$('rt').value<=$('pk').value)m.push('giờ trả phải sau giờ nhận');
- if(!$('nm').value.trim())m.push('họ tên');if(!/^0\d{9,10}$/.test($('ph').value.replace(/\s/g,'')))m.push('số điện thoại 10 số');
+ if(!$('nm').value.trim())m.push('họ tên');if(!/^0\d{9,10}$/.test($('ph').value.replace(/\s/g,'')))m.push('số điện thoại 10–11 số');
  if(m.length){$('err').textContent='Cần kiểm tra: '+m.join(', ')+'.';return}
  $('err').textContent='';
  try{await addDoc(collection(db,'bookings'),{type:'car',pickup:$('pk').value,ret:$('rt').value,name:$('nm').value.trim(),phone:$('ph').value.trim(),qty:Math.max(1,+$('qty').value||1),car:$('car').value,note:$('note').value.trim(),status:'new',createdAt:serverTimestamp()});
-  notify(`🛵 Đơn đặt xe mới\n${$('nm').value.trim()} - ${$('ph').value.trim()}\n${$('car').value} x${$('qty').value}\nNhận: ${$('pk').value.replace('T',' ')}\nTrả: ${$('rt').value.replace('T',' ')}${$('note').value.trim()?'\nGhi chú: '+$('note').value.trim():''}`);
-  $('bkb').innerHTML='<h3 class="ok">Đã gửi yêu cầu!</h3><p class="mut">Mình sẽ liên hệ qua zalo để xác nhận. Bạn vui lòng để ý zalo!</p>'}
+  notify(`🚗 Đơn đặt xe mới\n${$('nm').value.trim()} - ${$('ph').value.trim()}\n${$('car').value} x${$('qty').value}\nNhận: ${$('pk').value.replace('T',' ')}\nTrả: ${$('rt').value.replace('T',' ')}${$('note').value.trim()?'\nGhi chú: '+$('note').value.trim():''}`);
+  $('bkb').innerHTML='<h3 class="ok">Đã gửi yêu cầu!</h3><p class="mut">Mình sẽ gọi lại số bạn để xác nhận.</p>'}
  catch(x){$('err').textContent='Gửi thất bại, vui lòng thử lại hoặc gọi trực tiếp.'}};
 const REQ={train:['from','to','date','name','phone'],room:['in','out','name','phone']};
-const N={from:'Điểm đi',to:'Điểm đến',date:'Ngày đi',back:'Ngày về',qty:'Số lượng',in:'Nhận phòng',out:'Trả phòng',guests:'Số khách',roomType:'Loại phòng',roomLoc:'Vị trí phòng',name:'Họ tên',phone:'SĐT',note:'Ghi chú'};
-const TT={train:'🛳️ Đơn vé tàu mới',room:'🏨 Đơn đặt phòng mới'};
+const N={from:'Ga đi',to:'Ga đến',date:'Ngày đi',back:'Ngày về',qty:'Số lượng',in:'Nhận phòng',out:'Trả phòng',guests:'Số khách',roomType:'Loại phòng',roomLoc:'Vị trí phòng',name:'Họ tên',phone:'SĐT',note:'Ghi chú'};
+const TT={train:'🚆 Đơn vé tàu mới',room:'🏨 Đơn đặt phòng mới'};
 document.querySelectorAll('form[data-bk]').forEach(f=>f.onsubmit=async e=>{e.preventDefault();
  const t=f.dataset.bk,d=Object.fromEntries(new FormData(f)),err=f.querySelector('.err'),m=REQ[t].filter(k=>!String(d[k]||'').trim()).map(k=>N[k].toLowerCase());
- if(d.phone&&!/^0\d{9,10}$/.test(d.phone.replace(/\s/g,'')))m.push('số điện thoại 10 số');
+ if(d.phone&&!/^0\d{9,10}$/.test(d.phone.replace(/\s/g,'')))m.push('số điện thoại 10–11 số');
  if(t==='room'&&d.in&&d.out&&d.out<=d.in)m.push('ngày trả phải sau ngày nhận');
  if(t==='train'&&d.date&&d.back&&d.back<d.date)m.push('ngày về phải sau ngày đi');
  if(m.length){err.textContent='Cần kiểm tra: '+m.join(', ')+'.';return}
  err.textContent='';
  try{await addDoc(collection(db,'bookings'),{...d,type:t,status:'new',createdAt:serverTimestamp()});
   notify(TT[t]+'\n'+Object.entries(d).filter(([k,v])=>String(v).trim()).map(([k,v])=>N[k]+': '+v).join('\n'));
-  f.innerHTML='<h3 class="ok">Đã gửi yêu cầu!</h3><p class="mut">Mình sẽ liên hệ qua zalo để xác nhận. Bạn vui lòng để ý zalo!</p>'}
+  f.innerHTML='<h3 class="ok">Đã gửi yêu cầu!</h3><p class="mut">Mình sẽ gọi lại số bạn để xác nhận.</p>'}
  catch(x){err.textContent='Gửi thất bại, vui lòng thử lại hoặc gọi trực tiếp.'}});
 </script></body></html>
