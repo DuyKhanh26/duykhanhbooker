@@ -30,3 +30,6 @@ label{display:block;font-size:14px;color:var(--mut);margin-bottom:12px}
 dialog{background:var(--s);color:var(--cream);border:1px solid var(--line);border-radius:10px;max-width:520px;width:92%;padding:0}
 dialog::backdrop{background:#000a}dialog img{width:100%;display:block}dialog .b{padding:16px}
 @media(max-width:700px){.hero,.row{grid-template-columns:1fr}}
+header .nav{justify-content:center}
+header nav{display:flex;gap:4px;overflow-x:auto;max-width:100%;white-space:nowrap}
+.hero p a{margin:0 6px 8px 0}
