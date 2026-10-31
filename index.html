@@ -4,7 +4,7 @@
 <main class="wrap">
 <section data-v="gioi-thieu">
  <div class="hero"><div><h1 id="brand2"></h1><p class="mut pre" id="intro"></p>
-  <p><a class="btn" href="#ve-tau">Đặt vé tàu</a> <a class="btn" href="#phong">Đặt phòng</a> <a class="btn" href="#dat-xe">Đặt xe</a> <a class="btn g" id="call" href="#" hidden>Gọi / Zalo</a></p></div>
+  <p><a class="btn" id="call" href="#" hidden>Gọi / Zalo</a> <a class="btn g" id="fb" href="#" target="_blank" rel="noopener" hidden>Facebook</a> <a class="btn g" id="ig" href="#" target="_blank" rel="noopener" hidden>Instagram</a></p></div>
   <img class="av" id="av" alt="Ảnh đại diện"></div>
  <div class="block" id="expB" hidden><h2>Kinh nghiệm</h2><p class="mut pre" id="exp"></p></div>
  <div class="block" id="cusB" hidden><h2>Khách hàng</h2><div class="chips" id="cus"></div></div>
@@ -14,7 +14,7 @@
  <form data-bk="train" novalidate>
   <div class="row"><label>Ga đi<input name="from"></label><label>Ga đến<input name="to"></label></div>
   <div class="row"><label>Ngày đi<input type="date" name="date"></label><label>Ngày về (nếu khứ hồi)<input type="date" name="back"></label></div>
-  <div class="row"><label>Số vé<input type="number" name="qty" min="1" value="1"></label><label>Loại chỗ<select name="seat" id="seat"></select></label></div>
+  <label>Số vé<input type="number" name="qty" min="1" value="1"></label>
   <div class="row"><label>Họ tên<input name="name" autocomplete="name"></label><label>Số điện thoại<input name="phone" type="tel" autocomplete="tel"></label></div>
   <label>Ghi chú (giờ tàu mong muốn, tên hành khách...)<textarea name="note" rows="3"></textarea></label>
   <p class="err"></p><button class="btn">Gửi yêu cầu</button></form>
@@ -25,6 +25,7 @@
   <div class="row"><label>Ngày nhận phòng<input type="date" name="in"></label><label>Ngày trả phòng<input type="date" name="out"></label></div>
   <div class="row"><label>Số phòng<input type="number" name="qty" min="1" value="1"></label><label>Số khách<input type="number" name="guests" min="1" value="2"></label></div>
   <label>Loại phòng<select name="roomType" id="rtype"></select></label>
+  <label>Vị trí phòng<select name="roomLoc" id="rloc"></select></label>
   <div class="row"><label>Họ tên<input name="name" autocomplete="name"></label><label>Số điện thoại<input name="phone" type="tel" autocomplete="tel"></label></div>
   <label>Ghi chú<textarea name="note" rows="3"></textarea></label>
   <p class="err"></p><button class="btn">Gửi yêu cầu</button></form>
@@ -58,6 +59,7 @@ if(s.exp){$('expB').hidden=false;$('exp').textContent=s.exp}
 const cl=(s.customers||'').split('\n').map(x=>x.trim()).filter(Boolean);
 if(cl.length){$('cusB').hidden=false;$('cus').innerHTML=cl.map(x=>`<span>${esc(x)}</span>`).join('')}
 if(s.phone){$('call').hidden=false;$('call').href='tel:'+s.phone.replace(/\s/g,'')}
+[['fb','fb'],['ig','ig']].forEach(([i,k])=>{if(s[k]){$(i).hidden=false;$(i).href=/^https?:\/\//i.test(s[k])?s[k]:'https://'+s[k]}});
 $('fleetT').textContent=s.fleetTitle||'Những xe mình cho thuê';
 const cats=[...new Set(cars.map(c=>c.category).filter(Boolean))];
 function show(){
@@ -69,8 +71,8 @@ show();
 $('f').onclick=e=>{if(e.target.dataset.c){cat=e.target.dataset.c;show()}};
 $('car').innerHTML=cars.map(c=>`<option>${esc(c.name)}</option>`).join('')||'<option>Chưa có xe</option>';
 const opt=(t,d)=>(t||d).split('\n').map(x=>x.trim()).filter(Boolean).map(x=>`<option>${esc(x)}</option>`).join('');
-$('seat').innerHTML=opt(s.trainSeats,'Ghế ngồi mềm\nGiường nằm khoang 6\nGiường nằm khoang 4');
 $('rtype').innerHTML=opt(s.roomTypes,'Phòng đơn\nPhòng đôi\nPhòng gia đình');
+$('rloc').innerHTML=opt(s.roomLocs,'Trung tâm\nView biển');
 let cur;
 $('g').onclick=e=>{const c=cars.find(x=>x.id===e.target.dataset.i);if(!c)return;cur=c;
  $('dI').src=c.img||'';$('dN').textContent=c.name;$('dP').textContent=c.price||'';$('dS').textContent=c.spec||'';$('dD').textContent=c.desc||'';$('dlg').showModal()};
@@ -92,7 +94,7 @@ $('bk').onsubmit=async e=>{e.preventDefault();const m=[];
   $('fb').innerHTML='<h3 class="ok">Đã gửi yêu cầu!</h3><p class="mut">Mình sẽ gọi lại số bạn để xác nhận.</p>'}
  catch(x){$('err').textContent='Gửi thất bại, vui lòng thử lại hoặc gọi trực tiếp.'}};
 const REQ={train:['from','to','date','name','phone'],room:['in','out','name','phone']};
-const N={from:'Ga đi',to:'Ga đến',date:'Ngày đi',back:'Ngày về',qty:'Số lượng',seat:'Loại chỗ',in:'Nhận phòng',out:'Trả phòng',guests:'Số khách',roomType:'Loại phòng',name:'Họ tên',phone:'SĐT',note:'Ghi chú'};
+const N={from:'Ga đi',to:'Ga đến',date:'Ngày đi',back:'Ngày về',qty:'Số lượng',in:'Nhận phòng',out:'Trả phòng',guests:'Số khách',roomType:'Loại phòng',roomLoc:'Vị trí phòng',name:'Họ tên',phone:'SĐT',note:'Ghi chú'};
 const TT={train:'🚆 Đơn vé tàu mới',room:'🏨 Đơn đặt phòng mới'};
 document.querySelectorAll('form[data-bk]').forEach(f=>f.onsubmit=async e=>{e.preventDefault();
  const t=f.dataset.bk,d=Object.fromEntries(new FormData(f)),err=f.querySelector('.err'),m=REQ[t].filter(k=>!String(d[k]||'').trim()).map(k=>N[k].toLowerCase());
