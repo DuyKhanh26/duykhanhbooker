@@ -1,5 +1,5 @@
 <!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Quản trị Duy Khanh Booker</title><link rel="stylesheet" href="style.css"></head><body><div class="wrap">
+<title>Quản trị Duy Khánh Booker</title><link rel="stylesheet" href="style.css"></head><body><div class="wrap">
 <div id="lg" style="max-width:360px;margin:15vh auto"><h2>Đăng nhập quản trị</h2><p class="err" id="le"></p><button class="btn" id="gb">Đăng nhập bằng Google</button></div>
 <div id="app" hidden><div class="nav"><b class="brand">Quản trị</b><span class="tabs"><button data-t="s" class="on">Giới thiệu</button><button data-t="c">Xe</button><button data-t="b">Đơn đặt</button><button id="out">Thoát</button></span></div>
 <section id="p-s"><div class="box"><label>Tên thương hiệu<input id="s_brand"></label><label>SĐT / Zalo<input id="s_phone"></label><label>Link Facebook<input id="s_fb" placeholder="https://facebook.com/..."></label><label>Link Instagram<input id="s_ig" placeholder="https://instagram.com/..."></label>
@@ -50,9 +50,9 @@ $('c_list').onclick=async e=>{const E=e.target.dataset.e,D=e.target.dataset.d;
  if(D&&confirm('Xóa xe này?')){await deleteDoc(doc(db,'cars',D));loadC()}};
 /* Đơn đặt */
 const ST={new:'Mới',confirmed:'Đã xác nhận',done:'Hoàn thành',cancelled:'Đã hủy'};
-const det=b=>b.type==='train'?`🚆 ${esc(b.from)} → ${esc(b.to)} × ${esc(b.qty)} vé<br><span class="mut">Đi: ${esc(b.date)}${b.back?' · Về: '+esc(b.back):''}</span>`
+const det=b=>b.type==='train'?`🛳️ ${esc(b.from)} → ${esc(b.to)} × ${esc(b.qty)} vé<br><span class="mut">Đi: ${esc(b.date)}${b.back?' · Về: '+esc(b.back):''}</span>`
  :b.type==='room'?`🏨 ${esc(b.roomType)}${b.roomLoc?' · '+esc(b.roomLoc):''} × ${esc(b.qty)} phòng, ${esc(b.guests)} khách<br><span class="mut">Nhận: ${esc(b.in)} → Trả: ${esc(b.out)}</span>`
- :`🚗 ${esc(b.car)} × ${esc(b.qty)}<br><span class="mut">Nhận: ${esc(b.pickup).replace('T',' ')} → Trả: ${esc(b.ret).replace('T',' ')}</span>`;
+ :`🛵 ${esc(b.car)} × ${esc(b.qty)}<br><span class="mut">Nhận: ${esc(b.pickup).replace('T',' ')} → Trả: ${esc(b.ret).replace('T',' ')}</span>`;
 async function loadB(){const l=(await getDocs(query(collection(db,'bookings'),orderBy('createdAt','desc')))).docs;
  $('b_list').innerHTML=l.map(x=>{const b=x.data();return `<div class="box"><b>${esc(b.name)}</b> · <a href="tel:${esc(b.phone)}" style="color:var(--acc)">${esc(b.phone)}</a><br>
  ${det(b)}<br>${b.note?`<i>${esc(b.note)}</i><br>`:''}
