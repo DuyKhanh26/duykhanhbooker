@@ -1,7 +1,7 @@
 <!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Quản trị Duy Khanh Booker</title><link rel="stylesheet" href="style.css"></head><body><div class="wrap">
-<div id="lg" style="max-width:360px;margin:15vh auto"><h2>Đăng nhập quản trị</h2><p class="err" id="le"></p><button class="btn" id="gb">Đăng nhập bằng Google</button></div>
-<div id="app" hidden><div class="nav"><b class="brand">Quản trị</b><span class="tabs"><button data-t="s" class="on">Giới thiệu</button><button data-t="c">Xe</button><button data-t="b">Đơn đặt</button><button id="out">Thoát</button></span></div>
+<title>Admin Duy Khanh Booker</title><link rel="stylesheet" href="style.css"></head><body><div class="wrap">
+<div id="lg" style="max-width:360px;margin:15vh auto"><h2>Đăng nhập admin</h2><p class="err" id="le"></p><button class="btn" id="gb">Đăng nhập bằng Google</button></div>
+<div id="app" hidden><div class="nav"><b class="brand">Admin</b><span class="tabs"><button data-t="s" class="on">Giới thiệu</button><button data-t="c">Xe</button><button data-t="b">Đơn đặt</button><button id="out">Thoát</button></span></div>
 <section id="p-s"><div class="box"><label>Tên thương hiệu<input id="s_brand"></label><label>SĐT / Zalo<input id="s_phone"></label><label>Link Facebook<input id="s_fb" placeholder="https://facebook.com/..."></label><label>Link Instagram<input id="s_ig" placeholder="https://instagram.com/..."></label>
 <label>Giới thiệu<textarea id="s_intro" rows="4"></textarea></label><label>Kinh nghiệm<textarea id="s_exp" rows="3"></textarea></label>
 <label>Khách hàng (mỗi dòng một khách)<textarea id="s_customers" rows="3"></textarea></label><label>Tiêu đề trang Thông tin xe<input id="s_fleetTitle" placeholder="Những xe mình cho thuê"></label>
@@ -24,7 +24,7 @@ const U=(v,old)=>v.trim()||(old&&old.startsWith('data:')?old:''),pv=(i,p)=>{cons
 const AE=(ADMIN_EMAIL||'').trim().toLowerCase(),L=t=>{$('le').className='err';$('le').textContent=t};
 $('gb').onclick=async()=>{try{await signInWithPopup(auth,new GoogleAuthProvider())}catch(x){L(x.code==='auth/popup-blocked'?'Trình duyệt chặn cửa sổ đăng nhập, hãy cho phép popup rồi thử lại.':x.code==='auth/unauthorized-domain'?'Chưa thêm domain github.io vào Authorized domains của Firebase.':'Đăng nhập không thành công: '+x.code)}};
 $('out').onclick=()=>signOut(auth);
-onAuthStateChanged(auth,u=>{if(u&&(u.email||'').toLowerCase()!==AE){signOut(auth);L('Tài khoản Google này không có quyền quản trị.');return}$('lg').hidden=!!u;$('app').hidden=!u;if(u){loadS();loadC();loadB()}});
+onAuthStateChanged(auth,u=>{if(u&&(u.email||'').toLowerCase()!==AE){signOut(auth);L('Tài khoản Google này không có quyền admin.');return}$('lg').hidden=!!u;$('app').hidden=!u;if(u){loadS();loadC();loadB()}});
 document.querySelector('.tabs').onclick=e=>{const t=e.target.dataset.t;if(!t)return;
  document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b===e.target));
  ['s','c','b'].forEach(k=>$('p-'+k).hidden=k!==t)};
