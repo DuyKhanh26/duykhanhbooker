@@ -1,5 +1,5 @@
 <!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Duy Khanh Booker</title><link rel="stylesheet" href="style.css"></head><body>
+<title>Duy Khánh Booker</title><link rel="stylesheet" href="style.css"></head><body>
 <header><div class="wrap nav"><nav><a class="t" href="#gioi-thieu">Giới thiệu</a><a class="t" href="#ve-tau">Đặt vé tàu</a><a class="t" href="#phong">Đặt phòng</a><a class="t" href="#thong-tin-xe">Thông tin xe</a><a class="t" href="#dat-xe">Đặt xe</a></nav></div></header>
 <main class="wrap">
 <section data-v="gioi-thieu">
@@ -10,17 +10,17 @@
  <div class="block" id="cusB" hidden><h2>Khách hàng</h2><div class="chips" id="cus"></div></div>
  </section>
 <section data-v="ve-tau" hidden>
- <h2>Đặt vé tàu</h2><p class="mut">Điền thông tin, mình sẽ gọi lại báo giá và xác nhận.</p>
+ <h2>Đặt vé tàu</h2><p class="mut">Điền thông tin, mình sẽ liên hệ lại qua zalo để tư vấn giá và lịch tàu. Bạn vui lòng để ý zalo nhé!</p>
  <form data-bk="train" novalidate>
   <div class="row"><label>Điểm đi<input name="from"></label><label>Điểm đến<input name="to"></label></div>
   <div class="row"><label>Ngày đi<input type="date" name="date"></label><label>Ngày về (nếu khứ hồi)<input type="date" name="back"></label></div>
   <label>Số vé<input type="number" name="qty" min="1" value="1"></label>
   <div class="row"><label>Họ tên<input name="name" autocomplete="name"></label><label>Số điện thoại<input name="phone" type="tel" autocomplete="tel"></label></div>
-  <label>Ghi chú (giờ tàu mong muốn, tên hành khách...)<textarea name="note" rows="3"></textarea></label>
+  <label>Ghi chú (lựa chỗ đỡ say, lựa chỗ gần cửa sổ...)<textarea name="note" rows="3"></textarea></label>
   <p class="err"></p><button class="btn">Gửi yêu cầu</button></form>
 </section>
 <section data-v="phong" hidden>
- <h2>Đặt phòng</h2><p class="mut">Điền thông tin, mình sẽ gọi lại xác nhận phòng và giá.</p>
+ <h2>Đặt phòng</h2><p class="mut">Điền thông tin, mình sẽ liên hệ qua zalo để hỗ trợ.Bạn vui lòng để ý zalo nhé!</p>
  <form data-bk="room" novalidate>
   <div class="row"><label>Ngày nhận phòng<input type="date" name="in"></label><label>Ngày trả phòng<input type="date" name="out"></label></div>
   <div class="row"><label>Số phòng<input type="number" name="qty" min="1" value="1"></label><label>Số khách<input type="number" name="guests" min="1" value="2"></label></div>
@@ -34,7 +34,7 @@
  <h2 id="fleetT">Những xe mình cho thuê</h2><div class="f" id="f"></div><div class="grid" id="g"></div>
 </section>
 <section data-v="dat-xe" hidden>
- <h2>Đặt xe</h2><p class="mut">Điền thông tin, mình sẽ gọi lại xác nhận sớm.</p>
+ <h2>Đặt xe</h2><p class="mut">Điền thông tin, mình sẽ liên hệ qua zalo để xác nhận sớm. Bạn vui lòng để ý zalo nhé!</p>
  <form id="bk" novalidate><div id="bkb">
   <div class="row"><label>Ngày giờ tàu chạy (ra đảo)<input type="datetime-local" id="pk"></label><label>Ngày giờ tàu chạy (rời đảo)<input type="datetime-local" id="rt"></label></div>
   <div class="row"><label>Họ tên<input id="nm" autocomplete="name"></label><label>Số điện thoại<input id="ph" type="tel" autocomplete="tel"></label></div>
@@ -53,7 +53,7 @@ let cars=[],cat='all',s={};
 const opt=(t,d)=>(t||d).split('\n').map(x=>x.trim()).filter(Boolean).map(x=>`<option>${esc(x)}</option>`).join('');
 const fill=(id,h)=>{const v=$(id).value;$(id).innerHTML=h;if(v)$(id).value=v};
 function renderS(){
- const brand=s.brand||'Duy Khanh Booker';document.title=brand;$('brand2').textContent=brand;
+ const brand=s.brand||'Duy Khánh Booker';document.title=brand;$('brand2').textContent=brand;
  $('intro').textContent=s.intro||'';if(s.avatar){$('av').src=s.avatar;$('av').hidden=false}else $('av').hidden=true;
  $('expB').hidden=!s.exp;$('exp').textContent=s.exp||'';
  const cl=(s.customers||'').split('\n').map(x=>x.trim()).filter(Boolean);
@@ -61,8 +61,8 @@ function renderS(){
  $('call').hidden=!s.phone;if(s.phone)$('call').href='tel:'+s.phone.replace(/\s/g,'');
  [['fb','fb'],['ig','ig']].forEach(([i,k])=>{$(i).hidden=!s[k];if(s[k])$(i).href=/^https?:\/\//i.test(s[k])?s[k]:'https://'+s[k]});
  $('fleetT').textContent=s.fleetTitle||'Những xe mình cho thuê';
- fill('rtype',opt(s.roomTypes,'Phòng đơn\nPhòng đôi\nPhòng gia đình'));
- fill('rloc',opt(s.roomLocs,'Trung tâm\nView biển'));
+ fill('rtype',opt(s.roomTypes,'Phòng đơn\nPhòng đôi\nPhòng gia đình\nNhà nguyên căn'));
+ fill('rloc',opt(s.roomLocs,'Trung tâm\nView biển\nGần bến tàu\nView bình minh\nView hoàng hôn\nGần bãi cạn'));
 }
 function show(){
  const cats=[...new Set(cars.map(c=>c.category).filter(Boolean))];if(cat!=='all'&&!cats.includes(cat))cat='all';
@@ -94,11 +94,11 @@ $('bk').onsubmit=async e=>{e.preventDefault();const m=[];
  $('err').textContent='';
  try{await addDoc(collection(db,'bookings'),{type:'car',pickup:$('pk').value,ret:$('rt').value,name:$('nm').value.trim(),phone:$('ph').value.trim(),qty:Math.max(1,+$('qty').value||1),car:$('car').value,note:$('note').value.trim(),status:'new',createdAt:serverTimestamp()});
   notify(`🚗 Đơn đặt xe mới\n${$('nm').value.trim()} - ${$('ph').value.trim()}\n${$('car').value} x${$('qty').value}\nTàu ra đảo: ${$('pk').value.replace('T',' ')}\nTàu rời đảo: ${$('rt').value.replace('T',' ')}${$('note').value.trim()?'\nGhi chú: '+$('note').value.trim():''}`);
-  $('bkb').innerHTML='<h3 class="ok">Đã gửi yêu cầu!</h3><p class="mut">Mình sẽ gọi lại số bạn để xác nhận.</p>'}
+  $('bkb').innerHTML='<h3 class="ok">Đã gửi yêu cầu!</h3><p class="mut">Mình sẽ liên hệ qua zalo để xác nhận. Bạn vui lòng để ý zalo nhé!</p>'}
  catch(x){$('err').textContent='Gửi thất bại, vui lòng thử lại hoặc gọi trực tiếp.'}};
 const REQ={train:['from','to','date','name','phone'],room:['in','out','name','phone']};
 const N={from:'Điểm đi',to:'Điểm đến',date:'Ngày đi',back:'Ngày về',qty:'Số lượng',in:'Nhận phòng',out:'Trả phòng',guests:'Số khách',roomType:'Loại phòng',roomLoc:'Vị trí phòng',name:'Họ tên',phone:'SĐT',note:'Ghi chú'};
-const TT={train:'🚆 Đơn vé tàu mới',room:'🏨 Đơn đặt phòng mới'};
+const TT={train:'🛳️ Đơn vé tàu mới',room:'🏨 Đơn đặt phòng mới'};
 document.querySelectorAll('form[data-bk]').forEach(f=>f.onsubmit=async e=>{e.preventDefault();
  const t=f.dataset.bk,d=Object.fromEntries(new FormData(f)),err=f.querySelector('.err'),m=REQ[t].filter(k=>!String(d[k]||'').trim()).map(k=>N[k].toLowerCase());
  if(d.phone&&!/^0\d{9,10}$/.test(d.phone.replace(/\s/g,'')))m.push('số điện thoại 10–11 số');
@@ -108,6 +108,6 @@ document.querySelectorAll('form[data-bk]').forEach(f=>f.onsubmit=async e=>{e.pre
  err.textContent='';
  try{await addDoc(collection(db,'bookings'),{...d,type:t,status:'new',createdAt:serverTimestamp()});
   notify(TT[t]+'\n'+Object.entries(d).filter(([k,v])=>String(v).trim()).map(([k,v])=>N[k]+': '+v).join('\n'));
-  f.innerHTML='<h3 class="ok">Đã gửi yêu cầu!</h3><p class="mut">Mình sẽ gọi lại số bạn để xác nhận.</p>'}
+  f.innerHTML='<h3 class="ok">Đã gửi yêu cầu!</h3><p class="mut">Mình sẽ liên hệ qua zalo để xác nhận. Bạn vui lòng để ý zalo nhé!</p>'}
  catch(x){err.textContent='Gửi thất bại, vui lòng thử lại hoặc gọi trực tiếp.'}});
 </script></body></html>
