@@ -1,0 +1,26 @@
+// FIRESTORE RULES - dán vào Firebase > Firestore Database > tab Rules > Publish
+// BẮT BUỘC: thay ten@gmail.com (1 chỗ, bên dưới) bằng đúng email admin của bạn.
+// (Dòng bắt đầu bằng // là ghi chú, dán vào Firebase cũng được.)
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{db}/documents {
+
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == 'ten@gmail.com'
+        && request.auth.token.email_verified == true;
+    }
+
+    // Giới thiệu + thông tin xe: ai cũng xem được, chỉ admin sửa
+    match /settings/{d} { allow read: if true; allow write: if isAdmin(); }
+    match /cars/{d}     { allow read: if true; allow write: if isAdmin(); }
+
+    // Đơn đặt: khách chỉ được GỬI (phải có đồng ý), chỉ admin xem/sửa/xóa
+    match /bookings/{d} {
+      allow create: if request.resource.data.consent == true
+        && request.resource.data.name is string && request.resource.data.name.size() < 100
+        && request.resource.data.phone is string && request.resource.data.phone.size() < 20;
+      allow read, update, delete: if isAdmin();
+    }
+  }
+}

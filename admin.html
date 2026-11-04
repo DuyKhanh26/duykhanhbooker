@@ -2,7 +2,7 @@
 <title>Admin Duy Khanh Booker</title><link rel="stylesheet" href="style.css"></head><body><div class="wrap">
 <div id="lg" style="max-width:360px;margin:15vh auto"><h2>Đăng nhập admin</h2><p class="err" id="le"></p><button class="btn" id="gb">Đăng nhập bằng Google</button></div>
 <div id="app" hidden><div class="nav"><b class="brand">Admin</b><span class="tabs"><button data-t="s" class="on">Giới thiệu</button><button data-t="c">Xe</button><button data-t="b">Đơn đặt</button><button id="out">Thoát</button></span></div>
-<section id="p-s"><div class="box"><label>Tên thương hiệu<input id="s_brand"></label><label>SĐT / Zalo<input id="s_phone"></label><label>Link Facebook<input id="s_fb" placeholder="https://facebook.com/..."></label><label>Link Instagram<input id="s_ig" placeholder="https://instagram.com/..."></label>
+<section id="p-s"><div class="box"><label>Tên thương hiệu<input id="s_brand"></label><label>SĐT / Zalo<input id="s_phone"></label><label>Link Facebook<input id="s_fb" placeholder="https://facebook.com/..."></label><label>Link Instagram<input id="s_ig" placeholder="https://instagram.com/..."></label><label>Nội dung Chính sách bảo mật (khách bấm link trong form sẽ thấy; để trống = dùng mẫu có sẵn)<textarea id="s_privacy" rows="7"></textarea></label>
 <label>Giới thiệu<textarea id="s_intro" rows="4"></textarea></label><label>Kinh nghiệm<textarea id="s_exp" rows="3"></textarea></label>
 <label>Khách hàng (mỗi dòng một khách)<textarea id="s_customers" rows="3"></textarea></label><label>Tiêu đề trang Thông tin xe<input id="s_fleetTitle" placeholder="Những xe mình cho thuê"></label>
 <label>Loại phòng (mỗi dòng một loại)<textarea id="s_roomTypes" rows="3" placeholder="Phòng đôi"></textarea></label><label>Vị trí phòng (mỗi dòng một loại)<textarea id="s_roomLocs" rows="2" placeholder="Trung tâm"></textarea></label>
@@ -29,7 +29,7 @@ document.querySelector('.tabs').onclick=e=>{const t=e.target.dataset.t;if(!t)ret
  document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b===e.target));
  ['s','c','b'].forEach(k=>$('p-'+k).hidden=k!==t)};
 /* Giới thiệu */
-const K=['brand','phone','intro','exp','customers','fleetTitle','roomTypes','roomLocs','fb','ig'];let av='';
+const K=['brand','phone','intro','exp','customers','fleetTitle','roomTypes','roomLocs','fb','ig','privacy'];let av='';
 async function loadS(){const d=(await getDoc(doc(db,'settings','site'))).data()||{};K.forEach(k=>$('s_'+k).value=d[k]||'');av=d.avatar||'';$('s_av').value=av.startsWith('data:')?'':av;pv('s_av','s_pv');if(av.startsWith('data:')){$('s_pv').src=av;$('s_pv').hidden=false}}
 $('s_av').oninput=()=>pv('s_av','s_pv');
 $('s_save').onclick=async()=>{const d={avatar:U($('s_av').value,av)};K.forEach(k=>d[k]=$('s_'+k).value);await setDoc(doc(db,'settings','site'),d,{merge:true});$('s_m').textContent='Đã lưu';setTimeout(()=>$('s_m').textContent='',2000)};
@@ -55,7 +55,7 @@ const det=b=>b.type==='train'?`🚆 ${esc(b.from)} → ${esc(b.to)} × ${esc(b.q
  :`🚗 ${esc(b.car)} × ${esc(b.qty)}<br><span class="mut">Tàu ra đảo: ${esc(b.pickup).replace('T',' ')} → Tàu rời đảo: ${esc(b.ret).replace('T',' ')}</span>`;
 async function loadB(){const l=(await getDocs(query(collection(db,'bookings'),orderBy('createdAt','desc')))).docs;
  $('b_list').innerHTML=l.map(x=>{const b=x.data();return `<div class="box"><b>${esc(b.name)}</b> · <a href="tel:${esc(b.phone)}" style="color:var(--acc)">${esc(b.phone)}</a><br>
- ${det(b)}<br>${b.note?`<i>${esc(b.note)}</i><br>`:''}
+ ${det(b)}<br>${b.consent?'<small class="ok">✔ Đã đồng ý Chính sách bảo mật</small><br>':''}${b.note?`<i>${esc(b.note)}</i><br>`:''}
  <select data-s="${x.id}" style="width:auto">${Object.entries(ST).map(([k,v])=>`<option value="${k}" ${b.status===k?'selected':''}>${v}</option>`).join('')}</select>
  <button class="btn g" data-x="${x.id}">Xóa</button></div>`}).join('')||'<p class="mut">Chưa có đơn.</p>'}
 $('b_list').onchange=e=>{if(e.target.dataset.s)updateDoc(doc(db,'bookings',e.target.dataset.s),{status:e.target.value})};
